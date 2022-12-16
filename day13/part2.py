@@ -47,13 +47,29 @@ def is_ordered(left, right):
     return 0
 
 
+def sort_packets(packets):
+    n = len(packets)
+    for i in range(n - 1):
+        for j in range(0, n - i - 1):
+            order = is_ordered(packets[j], packets[j+1])
+            if order == -1:
+                packets[j], packets[j + 1] = packets[j + 1], packets[j]
+
+
 def calculate(lines):
-    output = 0
-    index = 1
+    first_index = [[2]]
+    second_index = [[6]]
+    packets = [first_index, second_index]
     for left, right in get_pair(lines):
-        if is_ordered(left, right) == 1:
-            output += index
-        index += 1
+        packets.append(left)
+        packets.append(right)
+
+    sort_packets(packets)
+
+    output = 1
+    for index, packet in enumerate(packets):
+        if packet == first_index or packet == second_index:
+            output *= index + 1
 
     return output
 
