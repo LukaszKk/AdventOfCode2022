@@ -1,0 +1,23 @@
+import os
+
+
+def calculate(lines):
+    output = 0
+
+    return output
+
+
+def read_input():
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+    with open(current_dir + "/input.txt", "r") as f:
+        return f.readlines()
+
+
+def main():
+    lines = read_input()
+    output = calculate(lines)
+    print(output)
+
+
+if __name__ == "__main__":
+    main()
