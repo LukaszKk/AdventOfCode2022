@@ -1,6 +1,4 @@
 import os
-import sys
-sys.setrecursionlimit(25000)
 
 
 ROCK = "#"
