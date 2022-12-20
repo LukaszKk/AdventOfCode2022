@@ -1,5 +1,5 @@
 import os
-
+import sys
 
 ROCK = "#"
 AIR = "."
@@ -47,46 +47,62 @@ class Board:
             previous_y = y
 
     def fill(self):
-        for y in range(0, self.max_y + 1):
+        for y in range(0, self.max_y + 3):
             self.board.append([])
-            for x in range(0, self.max_x + 1):
+            for x in range(0, self.max_x + 2):
                 if (y, x) == self.sand_starting_position:
                     self.board[y].append(SAND_START)
+                elif y == self.max_y + 2:
+                    self.board[y].append(ROCK)
                 elif (x, y) in self.rock_points:
                     self.board[y].append(ROCK)
                 else:
                     self.board[y].append(AIR)
 
     def print(self):
-        for y in range(0, self.max_y + 1):
-            for x in range(self.min_x - 1, self.max_x + 1):
-                print(self.board[y][x], end="")
-            print()
+        original_stdout = sys.stdout
+        with open("output.txt", 'w') as f:
+            sys.stdout = f
+            for y in range(0, self.max_y + 3):
+                for x in range(self.min_x - 1, self.max_x + 10):
+                    if len(self.board[y]) < x + 1:
+                        print(AIR, end="")
+                    else:
+                        print(self.board[y][x], end="")
+                print()
+            sys.stdout = original_stdout
+
 
     def fall_sand(self):
         position = self.sand_starting_position
         while True:
-            if len(self.board) - 2 < position[0]:
-                return
+            if len(self.board[self.max_y + 2]) < position[1] + 2:
+                self.board[self.max_y + 2].append(ROCK)
+
+            if len(self.board[position[0] + 1]) < position[1] + 2:
+                self.board[position[0] + 1].append(AIR)
+                self.max_x = position[1] + 1 if self.max_x < position[1] + 1 else self.max_x
 
             if self.board[position[0] + 1][position[1]] == AIR:
                 if position != self.sand_starting_position:
                     self.board[position[0]][position[1]] = AIR
                 self.board[position[0] + 1][position[1]] = SAND
                 position = (position[0] + 1, position[1])
-            elif (position[1] - 1 > 0) and (self.board[position[0] + 1][position[1] - 1] == AIR):
+            elif self.board[position[0] + 1][position[1] - 1] == AIR:
                 if position != self.sand_starting_position:
                     self.board[position[0]][position[1]] = AIR
                 self.board[position[0] + 1][position[1] - 1] = SAND
                 position = (position[0] + 1, position[1] - 1)
-            elif (position[1] + 1 < len(self.board[position[0] + 1])) and (
-                    self.board[position[0] + 1][position[1] + 1] == AIR):
+                self.min_x = position[1] - 1 if self.min_x > position[1] - 1 else self.min_x
+            elif self.board[position[0] + 1][position[1] + 1] == AIR:
                 if position != self.sand_starting_position:
                     self.board[position[0]][position[1]] = AIR
                 self.board[position[0] + 1][position[1] + 1] = SAND
                 position = (position[0] + 1, position[1] + 1)
             else:
                 self.rest += 1
+                if position == (0, 500):
+                    return
                 position = self.sand_starting_position
 
     @staticmethod
