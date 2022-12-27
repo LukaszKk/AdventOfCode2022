@@ -18,17 +18,16 @@ def manhattan_distance(point1, point2):
 
 
 def find_all_points_within_distance(taken_points, point, distance, value):
-    for y in range(point[1], point[1] + distance + 1):
-        if y == value:
-            for x in range(0, distance + 1 - (y - point[1])):
-                taken_points.add((point[0] + x, y))
-                taken_points.add((point[0] - x, y))
+    y = value
+    if y in range(point[1], point[1] + distance + 1):
+        for x in range(0, distance + 1 - (y - point[1])):
+            taken_points.add((point[0] + x, y))
+            taken_points.add((point[0] - x, y))
 
-    for y in range(point[1] - distance, point[1]):
-        if y == value:
-            for x in range(0, y - (point[1] - distance) + 1):
-                taken_points.add((point[0] + x, y))
-                taken_points.add((point[0] - x, y))
+    if y in range(point[1] - distance, point[1]):
+        for x in range(0, y - (point[1] - distance) + 1):
+            taken_points.add((point[0] + x, y))
+            taken_points.add((point[0] - x, y))
 
     return taken_points
 
