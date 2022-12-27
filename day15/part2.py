@@ -17,19 +17,25 @@ def manhattan_distance(point1, point2):
     return sum(abs(value1 - value2) for value1, value2 in zip(point1, point2))
 
 
-def find_all_points_within_distance(taken_points, point, distance, value):
-    y = value
-    if y in range(point[1], point[1] + distance + 1):
-        for x in range(0, distance + 1 - (y - point[1])):
-            taken_points.add((point[0] + x, y))
-            taken_points.add((point[0] - x, y))
+def find_border(point, distance, length):
+    border_points = set()
+    for y in range(point[1], point[1] + distance + 1):
+        if 0 < y <= length:
+            x = distance + 1 - (y - point[1])
+            if 0 < point[0] + x <= length:
+                border_points.add((point[0] + x, y))
+            if 0 < point[0] - x <= length:
+                border_points.add((point[0] - x, y))
 
-    if y in range(point[1] - distance, point[1]):
-        for x in range(0, y - (point[1] - distance) + 1):
-            taken_points.add((point[0] + x, y))
-            taken_points.add((point[0] - x, y))
+    for y in range(point[1] - distance, point[1]):
+        if 0 < y <= length:
+            x = y - (point[1] - distance) + 1
+            if 0 < point[0] + x <= length:
+                border_points.add((point[0] + x, y))
+            if 0 < point[0] - x <= length:
+                border_points.add((point[0] - x, y))
 
-    return taken_points
+    return border_points
 
 
 def print_values(beacons, sensors, points):
@@ -51,16 +57,26 @@ def print_values(beacons, sensors, points):
 
 def calculate(lines):
     beacons, sensors = read_values(lines)
-    taken_points = set()
-    value = 2000000
+    length = 4000000
     for sensor, beacon in zip(sensors, beacons):
         distance = manhattan_distance(sensor, beacon)
-        find_all_points_within_distance(taken_points, sensor, distance, value)
+        border_points = find_border(sensor, distance, length)
 
-    # print_values(beacons, sensors, taken_points)
+        for border in border_points:
+            inside = False
 
-    taken_points = [point for point in taken_points if point not in beacons and point not in sensors]
-    return len(taken_points)
+            for new_sensor, new_beacon in zip(sensors, beacons):
+                new_distance = manhattan_distance(new_sensor, new_beacon)
+                border_to_sensor_distance = manhattan_distance(new_sensor, border)
+                if border_to_sensor_distance <= new_distance:
+                    inside = True
+                    break
+
+            if not inside:
+                print(border)
+                return border[0] * 4000000 + border[1]
+
+    return 0
 
 
 def read_input():
